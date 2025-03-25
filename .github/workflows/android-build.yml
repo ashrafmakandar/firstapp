@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main  # Trigger the workflow for pull requests to the 'main' branch
+  workflow_dispatch:  # Allows manual triggering from the GitHub UI
 
 jobs:
   build:
@@ -34,5 +35,3 @@ jobs:
       run: |
         cd android
         ./gradlew assembleRelease  # Build a release APK. Use assembleDebug for debug builds
-
-  workflow_dispatch: 
