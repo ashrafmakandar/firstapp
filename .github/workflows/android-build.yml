@@ -35,3 +35,4 @@ jobs:
         cd android
         ./gradlew assembleRelease  # Build a release APK. Use assembleDebug for debug builds
 
+  workflow_dispatch: 
