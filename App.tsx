@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import states from './States'
 import langs from './langs';
 import CheckBox from 'react-native-check-box'
+import countries from './Cites';
 
 export default function App() {
 
@@ -17,12 +18,22 @@ export default function App() {
     selected:boolean
   };
 
+
+  type countylist={
+    country:string,
+    cities?:string[],
+    states?: Record<string, string[]>;
+  }
+ 
+
   const [selected,setSelected]= useState<string>();
   const [show,setShow]= useState<boolean>(false);
   const [showModal,setShowModal]= useState<boolean>(false);
   const [vals,setVals]= useState<stateparam[]>(states);
   const [all,setAll]= useState<stateparam[]>(states);
   const [languge,setLangugae]= useState<langparams[]>();
+  const [allCountries,setAllCounties]= useState<countylist[]>(countries);
+  const [alldata,setAllData]= useState<string[]|Record<string, string[]>  |undefined>();
   function search(val: string) {
    let cm=  vals.filter((va)=>{
     return va.name.toString().toUpperCase().match(val.toString().toUpperCase())
@@ -72,9 +83,51 @@ export default function App() {
   return (
     <SafeAreaView style={{
       backgroundColor:"#f8f8f8",
-      flex:1,marginTop:50,width:"100%"
+      flex:1,marginTop:100,width:"100%"
     }}>
+      <View style={{
+        height:300,marginTop:40
+      }}>
 
+      <FlatList
+      data={allCountries}
+      renderItem={({item,index})=>{
+        return(
+          <TouchableOpacity 
+          onPress={()=>{
+            console.log(item);
+            const states = item.states ? Object.values(item.states).flat() : [];
+            setAllData(item.cities!=null?item.cities:states)
+          }}
+          style={{
+            height:56,paddingHorizontal:10,margin:5,borderRadius:10,borderWidth:1,
+       
+          }}>
+            <Text style={{
+              paddingTop:5,paddingBottom:5,
+              fontWeight:"bold",color:"#526622",fontSize:17,textTransform:"capitalize"
+            }}>{item.country}</Text>
+          </TouchableOpacity>
+        )
+
+      }}
+      
+      />
+      </View>
+      <FlatList
+      data={alldata}
+      renderItem={({item})=>{
+     
+        return(
+          <View>
+            <Text>{item}</Text>
+          </View>
+        )
+
+      }}
+      />
+    
+{/* 
 <View 
 
 style={{
@@ -94,9 +147,9 @@ style={{
 
   <Text>click</Text>
   </TouchableOpacity>
-</View>
+</View> */}
 
-<FlatList
+{/* <FlatList
 data={languge}
 numColumns={2}
 renderItem={({item,index})=>{
@@ -127,7 +180,7 @@ renderItem={({item,index})=>{
   )
 }}
 
-/>
+/> */}
            
 
  
