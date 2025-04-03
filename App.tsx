@@ -1,5 +1,5 @@
-import { View, Text, FlatList, SafeAreaView, TouchableOpacity, TextInput, Modal } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, FlatList, SafeAreaView, TouchableOpacity, TextInput, Modal, Animated } from 'react-native'
+import React, { useEffect, useRef, useState } from 'react'
 import states from './States'
 import langs from './langs';
 import CheckBox from 'react-native-check-box'
@@ -25,6 +25,10 @@ export default function App() {
     states?: Record<string, string[]>;
   }
  
+  type Users={
+    userName:string,
+    
+  }
 
   const [selected,setSelected]= useState<string>();
   const [show,setShow]= useState<boolean>(false);
@@ -34,6 +38,14 @@ export default function App() {
   const [languge,setLangugae]= useState<langparams[]>();
   const [allCountries,setAllCounties]= useState<countylist[]>(countries);
   const [alldata,setAllData]= useState<string[]|Record<string, string[]>  |undefined>();
+  const [users,setUsers]= useState<Users[]>([]);
+  const [name,setName]= useState<string>("");
+  const valueref= useRef(new Animated.Value(0)).current;
+  const [edited,setEdited]= useState<boolean>(false);
+  const [editIndex,setEditIndex]= useState<number>();
+  const valueref1= useRef(new Animated.ValueXY({
+    x:10,y:20
+  })).current;
   function search(val: string) {
    let cm=  vals.filter((va)=>{
     return va.name.toString().toUpperCase().match(val.toString().toUpperCase())
@@ -42,7 +54,15 @@ export default function App() {
    setAll(cm);
    
    
+   
 
+  }
+  const startAnimation=()=>{
+    Animated.timing(valueref1,{
+      toValue:200,
+      duration:2100,
+      useNativeDriver:false
+    }).start()
   }
 
 
@@ -55,6 +75,7 @@ export default function App() {
     
     // Now update the state with the modified array
     setLangugae(updatedLangs);
+    startAnimation();
 
   },[])
 
@@ -80,16 +101,129 @@ export default function App() {
     setLangugae(updatedLanguage);
   }
 
+  const addUser=()=>{
+ 
+setUsers(us=>[...users,{
+  userName:name
+}]);
+
+  }
+
+
+  const editItem=(index:number)=>{
+
+    const item = users.filter((it,ind)=>{
+      return index===ind
+    });
+    setName(item[0].userName);
+    setEditIndex(index);
+   
+
+  
+    console.log("edited"+JSON.stringify(item));
+    console.log(users);
+
+  }
+
+
+  const deleteItem=(index:number)=>{
+    const item = users.filter((it,ind)=>{
+      return index!=ind
+    });
+    console.log("dleeted"+JSON.stringify(item));
+    setUsers(item);
+  }
+
+  const editItems=()=>{
+    console.log("editedindex",editIndex);
+    let updatedUsers = users.map((item, ind) => {
+      if (editIndex === ind) {
+        return { ...item, userName: name };  // Update userName at editIndex
+      }
+      return item;  // Return the user unchanged
+    });
+    
+    setUsers(updatedUsers);
+  }
+
   return (
     <SafeAreaView style={{
       backgroundColor:"#f8f8f8",
       flex:1,marginTop:100,width:"100%"
     }}>
+
       <View style={{
-        height:300,marginTop:40
+      marginTop:40
       }}>
 
-      <FlatList
+        <TextInput
+        placeholder='Enter user name'
+        value={name}
+        onChangeText={(e)=>{
+          setName(e)
+        }}
+        style={{
+          borderRadius:12,borderWidth:1,height:48,margin:10,padding:10,fontSize:20,fontWeight:"bold"
+        }}
+        />
+        <TouchableOpacity 
+        style={{
+          elevation:5,
+          margin:5,
+          padding:10,
+          justifyContent:"center",alignContent:"center",alignItems:"center",
+          height:48,borderRadius:10,borderWidth:1,borderColor:'#fff',backgroundColor:"#000000"
+        }}
+        onPress={()=>{
+          edited?
+         editItems()
+          :
+          
+          addUser()}}>
+          <Text style={{
+            color:"#fff",fontSize:20,fontWeight:"bold"
+          }}> {edited?"edit user":"Add User"}</Text>
+        </TouchableOpacity>
+        <FlatList
+        data={users}
+        renderItem={({item,index}:{item:Users,index:number})=>{
+          return(
+            <View style={{
+              height:56,borderWidth:1,borderRadius:10,
+              width:"96%",
+              justifyContent:"space-between",flexDirection:"row",margin:5,alignContent:"center",alignItems:"center"
+            }}>
+        <Text style={{
+          fontSize:17,fontWeight:"bold",color:"blue"
+        }}>      {item.userName}</Text>
+        <TouchableOpacity
+        onPress={()=>{editItem(index)
+          setEdited(true);
+
+        }}
+        >
+        <Text style={{
+          fontSize:17,fontWeight:"bold",color:"green"
+        }}>Edit</Text>
+
+        </TouchableOpacity>
+       <TouchableOpacity onPress={()=>{deleteItem(index)}}>
+       <Text
+        style={{
+          fontSize:16,fontWeight:"bold",color:"red",margin:10
+        }}
+        
+        >Delete</Text>
+
+       </TouchableOpacity>
+       
+            </View>
+          )
+        }}
+        />
+
+
+      {/* <FlatList
       data={allCountries}
       renderItem={({item,index})=>{
         return(
@@ -112,9 +246,9 @@ export default function App() {
 
       }}
       
-      />
+      /> */}
       </View>
-      <FlatList
+      {/* <FlatList
       data={alldata}
       renderItem={({item})=>{
      
@@ -125,7 +259,9 @@ export default function App() {
         )
 
       }}
-      />
+      /> */}
+
+  
     
 {/* 
 <View 
@@ -208,7 +344,7 @@ renderItem={({item,index})=>{
   }}
   
   />
-  <FlatList
+  {/* <FlatList
      
      data={all}
      scrollEnabled
@@ -231,7 +367,7 @@ renderItem={({item,index})=>{
          </TouchableOpacity>
        )
      }}
-     />
+     /> */}
 
     </View>
  

@@ -1,42 +1,29 @@
-name: React Native Android Build
-
+name: react-native-android-build-apk
 on:
   push:
     branches:
-      - main  # Trigger the workflow for pushes to the 'main' branch
-  pull_request:
-    branches:
-      - main  # Trigger the workflow for pull requests to the 'main' branch
-  workflow_dispatch:  # Allows manual triggering from the GitHub UI
-
+      - master
 jobs:
-  build:
-    runs-on: ubuntu-latest  # The environment for the build process
-
+  install-and-test:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2  # Check out the code from the repository
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16'  # Use the appropriate Node.js version for your project
-
-    - name: Install dependencies
-      run: |
-        npm install  # Or use yarn if you're using it: yarn install
-
-    - name: Install Android SDK
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y openjdk-8-jdk
-        sudo apt-get install -y android-sdk
-        export ANDROID_HOME=/usr/lib/android-sdk
-        export PATH=$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH
-        sdkmanager --update
-        sdkmanager "build-tools;30.0.3" "platforms;android-30"  # Update to your target SDK version
-
-    - name: Build Android Release APK
-      run: |
-        cd android
-        ./gradlew assembleRelease  # Build a release APK. Use assembleDebug for debug builds
+      - uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: |
+          npm install
+  build-android:
+    needs: install-and-test
+    runs-on: ubuntu-latest
+    steps: 
+      - uses: actions/checkout@v3
+      - name: Install npm dependencies
+        run: |
+          npm install
+      - name: Build Android Release
+        run: |
+          cd android && ./gradlew assembleRelease
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/
