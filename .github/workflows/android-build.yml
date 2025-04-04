@@ -39,13 +39,13 @@ jobs:
           ./gradlew assembleRelease bundleRelease
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }}-${{ env.repository_name }}-apk
           path: android/app/build/outputs/apk/release/*.apk
 
       - name: Upload AAB
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.date_today }}-${{ env.repository_name }}-aab
           path: android/app/build/outputs/bundle/release/*.aab
